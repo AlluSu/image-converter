@@ -5,13 +5,12 @@ As an iOS user I had noticed that when sending photos taken with my iPhone to my
 
 ## Functioning
 - Clone the repository
-- run *pip install -r requirements.txt*
-- The *.HEIC* images should be in the same directory as the code
-- After running the script, the converted image files are then transferred to a folder called *converted-images*
-- The script converts every *.HEIC* image file to *.png* and *.jpg* images
+- run `pip install -r requirements.txt` (assumes you have *pip* installed)
+- usage: `converter.py [-h] [--inputpath INPUTPATH] [--outputpath OUTPUTPATH] [--formats {JPEG,PNG,all}]`
+    - You can run `python3 converter.py --help` on the command line to get the documentation how to use the command line arguments
+    - All arguments are optional
+- The script converts every *.HEIC* image file from the folder relative to the path of the program to *.png* and *.jpg* images in the folder 
 
 ## TODO:
-- Use *argparse* library for the user to determine the location of the input images, determine the location for the output folder for the converted images and what extensions the user wants to convert  
 - Study more about the *.HEIC* format, what does it contain and how it is formed  
 - Check more throughly does the conversion have any side effects in, e.g., file size, image quality, metadata etc.  
-

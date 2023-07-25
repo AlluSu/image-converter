@@ -9,39 +9,48 @@ def create_argument_parser():
     parser = argparse.ArgumentParser(description="Convert .HEIC images to .png and .jpg formats")
     parser.add_argument("--inputpath", help="Relative path to the folder of the images", default="/")
     parser.add_argument("--outputpath", help="Relative path to where the results will be stored", default="/converted-images")
-    parser.add_argument("--formats", help="To which formats the images will be converted", default=['JPEG', 'PNG'], choices=['JPEG', 'PNG'])
+    parser.add_argument("--formats", help="To which formats the images will be converted", default='all', choices=['JPEG', 'PNG', 'all'])
     args = parser.parse_args()
     return args
 
-def convert_images(args):
-    # Part of the pillow-heif package, needed to open the .heic/.heif as Pillow can't read them
-    register_heif_opener()
-
-    formats = args.formats
-    if args.outputpath:
-        outputdir = args.outputpath
-    else:
-        outputdir = "/"
+def configure_paths_and_formats(args):
     if args.inputpath:
         inputdir = args.inputpath
     else:
         inputdir = "/"
+    if args.outputpath:
+        outputdir = args.outputpath
+    else:
+        outputdir = "/"
+    if args.formats:
+        if args.formats == 'all':
+            formats = 'all'
+        elif args.formats == 'JPEG':
+            formats = 'JPEG'
+        else:
+            formats = 'PNG'    
     os.makedirs(outputdir, mode=0o777, exist_ok=True)
+    return inputdir, outputdir, formats
+
+def convert_images(inputdir, outputdir, formats):
+    # Part of the pillow-heif package, needed to open the .heic/.heif as Pillow can't read them out of the box
+    register_heif_opener()
     files = os.listdir(inputdir)
     for f in tqdm(files):
         if f.endswith(".HEIC"):
-            outpath = os.path.join(outputdir, f)
             inpath = os.path.join(inputdir, f)
+            outpath = os.path.join(outputdir, f)
             print("Converting file: " + f)
             img = Image.open(inpath)
-            if not args.formats or len(formats) == 2:
-                img.save(outpath.replace(".HEIC", ".jpg"), format=formats[0])
-                img.save(outpath.replace(".HEIC", ".png"), format=formats[1])
+            if formats == 'all':
+                img.save(outpath.replace(".HEIC", ".jpg"), format='JPEG')
+                img.save(outpath.replace(".HEIC", ".png"), format='PNG')
             elif formats == 'JPEG':
-                img.save(outpath.replace(".HEIC", ".jpg"), format=formats[0])
+                img.save(outpath.replace(".HEIC", ".jpg"), format=formats)
             else:
-                img.save(outpath.replace(".HEIC", ".png"), format=formats[1])
+                img.save(outpath.replace(".HEIC", ".png"), format=formats)
             print("Succesfully converted")
 
 args = create_argument_parser()
-convert_images(args)
+inputdir, outputdir, formats = configure_paths_and_formats(args)
+convert_images(inputdir, outputdir, formats)
